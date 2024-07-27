@@ -1,0 +1,24 @@
+"""
+Configuration settings for App.
+"""
+
+import logging
+from functools import lru_cache
+from pydantic_settings import BaseSettings
+
+log = logging.getLogger("uvicorn")
+
+
+class Settings(BaseSettings):
+    """Environment settings for App"""
+
+    environment: str = "dev"
+    testing: bool = 0
+
+
+@lru_cache
+def get_settings() -> BaseSettings:
+    """Get configuration settings for App"""
+
+    log.info("Loading config settings from the environment...")
+    return Settings()
