@@ -7,7 +7,7 @@ import os
 import pytest
 from starlette.testclient import TestClient
 
-from app.main import create_application
+from app.main import create_application, lifespan
 from app.config import get_settings, Settings
 
 
@@ -24,7 +24,7 @@ def test_app():
     """Test for App"""
 
     # setup
-    app = create_application()
+    app = create_application(lifespan)
     app.dependency_overrides[get_settings] = get_settings_override
     with TestClient(app) as test_client:
 
