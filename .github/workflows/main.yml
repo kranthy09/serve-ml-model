@@ -71,7 +71,7 @@ jobs:
             ${{ env.IMAGE }}:latest
       - name: Apply migrations
         run: |
-          docker exec web python app/db.py
+          docker exec ${{ env.IMAGE }} python app/db.py
       - name: Pytest
         run: docker exec fastapi-tdd python -m pytest .
       - name: Flake8
