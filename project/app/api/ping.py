@@ -13,7 +13,7 @@ router = APIRouter()
 async def pong(settings: Settings = Depends(get_settings)):
     """Simple ping endpoint for testing"""
     return {
-        "ping": "pong!",
+        "ping": "pong",
         "environment": settings.environment,
         "testing": settings.testing,
     }
