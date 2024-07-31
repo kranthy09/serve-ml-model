@@ -12,11 +12,9 @@ jobs:
     permissions:
       contents: read
       packages: write
-      attestations: write
-      id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: main
       - name: Log in to GitHub Packages
@@ -71,6 +69,9 @@ jobs:
             -e DATABASE_TEST_URL=sqlite://sqlite.db \
             -p 5003:8765 \
             ${{ env.IMAGE }}:latest
+      - name: Apply migrations
+        run: |
+          docker exec web python app/db.py
       - name: Pytest
         run: docker exec fastapi-tdd python -m pytest .
       - name: Flake8
