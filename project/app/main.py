@@ -2,10 +2,10 @@
 App Entry Point
 """
 
-import os
 import logging
-
+import os
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import RegisterTortoise
 

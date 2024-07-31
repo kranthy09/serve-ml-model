@@ -2,10 +2,7 @@
 Handles POST requests to create summaries
 """
 
-from typing import List
-
-
-from typing import Union
+from typing import List, Union
 
 from app.models.pydantic import SummaryPayloadSchema
 from app.models.tortoise import TextSummary
