@@ -4,8 +4,6 @@ Tests for /summaries endpoint
 
 import json
 
-import pytest
-
 
 def test_create_summary(test_app_with_db):
     """Test Create summary"""
