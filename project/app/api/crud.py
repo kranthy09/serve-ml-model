@@ -34,3 +34,23 @@ async def get_all() -> List:
 
     summaries = await TextSummary.all().values()
     return summaries
+
+
+async def delete(id: int) -> int:
+    """Utility for deleting a summary"""
+
+    summary = await TextSummary.filter(id=id).delete()
+
+    return summary
+
+
+async def put(id: int, payload: SummaryPayloadSchema) -> Union[dict, None]:
+    """Utiliy to update a summary"""
+
+    summary = await TextSummary.filter(id=id).update(
+        url=payload.url, summary=payload.summary
+    )
+    if summary:
+        updated_summary = await TextSummary.filter(id=id).first().values()
+        return updated_summary
+    return None

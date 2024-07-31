@@ -15,3 +15,9 @@ class SummaryResponseSchema(SummaryPayloadSchema):
     """Schema for summary response"""
 
     id: int
+
+
+class SummaryUpdatePayloadSchema(SummaryPayloadSchema):
+    """Schema for summary update payload"""
+
+    summary: str
