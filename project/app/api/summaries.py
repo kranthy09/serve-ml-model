@@ -30,7 +30,7 @@ async def create_summary(
 
 
 @router.get("/{id}/", response_model=SummarySchema)
-async def read_summary(id: int = Path(..., gt=0)) -> SummarySchema:
+async def read_summary(id: int = Path(..., gt=0)) -> SummarySchema:  # type: ignore
     """Reads summary"""
 
     summary = await crud.get(id)
@@ -41,7 +41,7 @@ async def read_summary(id: int = Path(..., gt=0)) -> SummarySchema:
 
 
 @router.get("/", response_model=List[SummarySchema])
-async def read_all_summaries() -> List[SummarySchema]:
+async def read_all_summaries() -> List[SummarySchema]:  # type: ignore
     """Reads all summaries"""
 
     summaries = await crud.get_all()
