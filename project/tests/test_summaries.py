@@ -4,6 +4,8 @@ Tests for /summaries endpoint
 
 import json
 
+import pytest
+
 
 def test_create_summary(test_app_with_db):
     """Test Create summary"""
@@ -154,94 +156,86 @@ def test_update_summary(test_app_with_db):
     assert response_dict["created_at"]
 
 
-def test_update_summary_invalid_json(test_app_with_db):
-    """Test raise expection update summary with invalid json"""
-
-    response = test_app_with_db.post(
-        "/summaries/", data=json.dumps({"url": "https://foo.bar/"})
-    )
-    summary_id = response.json()["id"]
-
-    response = test_app_with_db.put(f"summaries/{summary_id}/", data=json.dumps({}))
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "loc": ["body", "url"],
-                "msg": "Field required",
-                "type": "missing",
-                "input": {},
-                "url": "https://errors.pydantic.dev/2.8/v/missing",
-            },
-            {
-                "loc": ["body", "summary"],
-                "msg": "Field required",
-                "type": "missing",
-                "input": {},
-                "url": "https://errors.pydantic.dev/2.8/v/missing",
-            },
-        ]
-    }
-
-
-def test_update_summary_invalid_keys(test_app_with_db):
-    """Test raise exception when summary update invalid keys."""
-
-    response = test_app_with_db.post(
-        "/summaries/", data=json.dumps({"url": "https://foo.bar/"})
-    )
-    summary_id = response.json()["id"]
+@pytest.mark.parametrize(
+    "summary_id, payload, status_code, detail",
+    [
+        [
+            999,
+            {"url": "https://foo.bar/", "summary": "updated!"},
+            404,
+            "Summary not found",
+        ],
+        [
+            0,
+            {"url": "https://foo.bar/", "summary": "updated!"},
+            422,
+            [
+                {
+                    "type": "greater_than",
+                    "loc": ["path", "id"],
+                    "msg": "Input should be greater than 0",
+                    "input": "0",
+                    "ctx": {"gt": 0},
+                    "url": "https://errors.pydantic.dev/2.8/v/greater_than",
+                }
+            ],
+        ],
+        [
+            1,
+            {},
+            422,
+            [
+                {
+                    "type": "missing",
+                    "loc": ["body", "url"],
+                    "msg": "Field required",
+                    "input": {},
+                    "url": "https://errors.pydantic.dev/2.8/v/missing",
+                },
+                {
+                    "type": "missing",
+                    "loc": ["body", "summary"],
+                    "msg": "Field required",
+                    "input": {},
+                    "url": "https://errors.pydantic.dev/2.8/v/missing",
+                },
+            ],
+        ],
+        [
+            1,
+            {"url": "https://foo.bar"},
+            422,
+            [
+                {
+                    "type": "missing",
+                    "loc": ["body", "summary"],
+                    "msg": "Field required",
+                    "input": {"url": "https://foo.bar"},
+                    "url": "https://errors.pydantic.dev/2.8/v/missing",
+                }
+            ],
+        ],
+    ],
+)
+def test_update_summary_invalid(
+    test_app_with_db, summary_id, payload, status_code, detail
+):
+    """Test raise error for on invallid summary"""
     response = test_app_with_db.put(
-        f"/summaries/{summary_id}/",
-        data=json.dumps({"url": "https://foo.bar/"}),
+        f"/summaries/{summary_id}/", data=json.dumps(payload)
     )
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "loc": ["body", "summary"],
-                "msg": "Field required",
-                "type": "missing",
-                "input": {"url": "https://foo.bar/"},
-                "url": "https://errors.pydantic.dev/2.8/v/missing",
-            }
-        ]
-    }
+    assert response.status_code == status_code
+    print(response.json()["detail"])
+    assert response.json()["detail"] == detail
 
+
+def test_update_summary_invalid_url(test_app_with_db):
+    """Test update summary raise exception invalid url"""
     response = test_app_with_db.put(
-        f"/summaries/{summary_id}",
-        data=json.dumps({"url": "invalid://bar", "summary": "updated!"}),
+        "/summaries/1/",
+        data=json.dumps({"url": "invalid://url", "summary": "updated!"}),
     )
     assert response.status_code == 422
     assert (
         response.json()["detail"][0]["msg"] == "URL scheme should be 'http' or 'https'"
     )
-
-
-def test_update_summary_incorrect_id(test_app_with_db):
-    """Test raise expception update summary with id of 0"""
-
-    response = test_app_with_db.put(
-        "/summaries/999/",
-        data=json.dumps({"url": "https://foo.bar/", "summary": "Updated!"}),
-    )
-    response.status_code = 404
-    assert response.json()["detail"] == "Summary not found"
-
-    response = test_app_with_db.put(
-        "/summaries/0/",
-        data=json.dumps({"url": "https://foo.bar", "summary": "updated!"}),
-    )
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "ctx": {"gt": 0},
-                "input": "0",
-                "loc": ["path", "id"],
-                "msg": "Input should be greater than 0",
-                "type": "greater_than",
-                "url": "https://errors.pydantic.dev/2.8/v/greater_than",
-            }
-        ]
-    }
