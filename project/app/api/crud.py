@@ -17,7 +17,7 @@ async def post(payload: SummaryPayloadSchema) -> TextSummary:
     )
     await summary.save()
 
-    return summary
+    return summary.id
 
 
 async def get(id: int) -> Union[dict, None]:

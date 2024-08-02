@@ -23,10 +23,10 @@ async def create_summary(
 ) -> SummaryResponseSchema:
     """Creates summary"""
 
-    summary = await crud.post(payload)
+    summary_id = await crud.post(payload)
 
     response_object = {
-        "id": summary.id,
+        "id": summary_id,
         "url": payload.url,
     }
     return response_object
