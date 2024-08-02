@@ -3,18 +3,22 @@ Unittests for summaries api wih monkeypatch
 """
 
 import json
-
 from datetime import datetime
 
 import pytest
 
-from app.api import crud
+from app.api import crud, summaries
 
 
 def test_create_summary(test_app, monkeypatch):
     """Test create summary successful"""
     test_request_payload = {"url": "https://foo.bar/"}
     test_response_paylaod = {"id": 1, "url": "https://foo.bar/"}
+
+    async def mock_generate_summary(summary_id, url):
+        return None
+
+    monkeypatch.setattr(summaries, "generate_summary", mock_generate_summary)
 
     async def mock_post(payload):
         return 1
