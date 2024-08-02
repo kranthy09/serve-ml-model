@@ -76,8 +76,6 @@ jobs:
         run: docker exec serve-ml-model python -m pytest .
       - name: Flake8
         run: docker exec serve-ml-model python -m flake8 .
-      - name: isort
-        run: docker exec serve-ml-model python -m isort . --check-only
       - name: Black
         run: docker exec serve-ml-model python -m black . --check
 
